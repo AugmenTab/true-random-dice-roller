@@ -18,8 +18,8 @@ reqData = {
     "id": 18730
 }
 
-def rollDice(diceToRoll):
-    rolls = hitDiceRegex.findall(diceToRoll.lower())
+def parseDice(diceToParse):
+    rolls = hitDiceRegex.findall(diceToParse.lower())
     nums = []
     dice = []
     for roll in rolls:
@@ -30,10 +30,10 @@ def rollDice(diceToRoll):
             dice.append(list(map(int, die)))
         else:
             nums.append(int(roll))
-    nums.extend(getRandom(dice))
+    nums.extend(rollDice(dice))
     return sum(nums)
 
-def getRandom(randList):
+def rollDice(randList):
     results = []
     for i in randList:
         reqData['params']['n'] = i[0]
@@ -45,4 +45,4 @@ def getRandom(randList):
         results.extend(data)
     return results
 
-print(rollDice(input('Roll the dice!\n')))
+print(parseDice(input('Roll the dice!\n')))
