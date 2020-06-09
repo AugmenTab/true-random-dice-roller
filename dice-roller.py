@@ -1,14 +1,16 @@
 #! python3
 
+import config
 import re, requests
 
 hitDiceRegex = re.compile(r'([+/-]*[\d]*[d,D][\d]{1,2}|[+/-]*\d+)')
 
+api = config.apiKey
 reqData = {
     "jsonrpc": "2.0",
     "method": "generateIntegers",
     "params": {
-        "apiKey": "",
+        "apiKey": api,
         "n": 0,
         "min": 1,
         "max": 0,
