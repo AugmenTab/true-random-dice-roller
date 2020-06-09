@@ -7,11 +7,17 @@ reqData = {
     "method": "generateIntegers",
     "params": {
         "apiKey": "00000000-0000-0000-0000-000000000000",
-        "n": 0,
+        "n": 10,
         "min": 1,
-        "max": 0,
+        "max": 10,
         "replacement": True,
         "base": 10
     },
     "id": 18730
 }
+
+response = requests.post('https://api.random.org/json-rpc/1/invoke', json = reqData)
+response.raise_for_status()
+json = response.json()
+data = json['result']['random']['data']
+print(data)
