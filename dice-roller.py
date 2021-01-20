@@ -1,12 +1,13 @@
 #! python3
 
 import config
-import re, requests
+import re
+import requests
 
-hitDiceRegex = re.compile(r'([+/-]*[\d]*[d,D][\d]{1,2}|[+/-]*\d+)')
+hit_dice_regex = re.compile(r'([+/-]*[\d]*[d,D][\d]{1,2}|[+/-]*\d+)')
 
 api = config.apiKey
-reqData = {
+req_data = {
     "jsonrpc": "2.0",
     "method": "generateIntegers",
     "params": {
@@ -20,8 +21,9 @@ reqData = {
     "id": 18730
 }
 
-def parseDice(diceToParse):
-    rolls = hitDiceRegex.findall(diceToParse.lower())
+
+def parse_dice(dice_to_parse):
+    rolls = hit_dice_regex.findall(dice_to_parse.lower())
     nums = []
     dice = []
     for roll in rolls:
@@ -32,19 +34,21 @@ def parseDice(diceToParse):
             dice.append(list(map(int, die)))
         else:
             nums.append(int(roll))
-    nums.extend(rollDice(dice))
+    nums.extend(roll_dice(dice))
     return sum(nums)
 
-def rollDice(randList):
+
+def roll_dice(rand_list):
     results = []
-    for i in randList:
-        reqData['params']['n'] = i[0]
-        reqData['params']['max'] = i[1]
-        response = requests.post('https://api.random.org/json-rpc/1/invoke', json = reqData)
+    for i in rand_list:
+        req_data['params']['n'] = i[0]
+        req_data['params']['max'] = i[1]
+        response = requests.post('https://api.random.org/json-rpc/1/invoke', json=req_data)
         response.raise_for_status()
         json = response.json()
         data = json['result']['random']['data']
         results.extend(data)
     return results
 
-print(parseDice(input('Roll the dice!\n')))
+
+print(parse_dice(input('Roll the dice!\n')))
