@@ -6,10 +6,10 @@ import re
 import requests
 
 
-def parse_dice(dice_to_parse, req_data):
+def parse_dice(dice_to_parse):
     hit_dice_regex = re.compile(r'([+/-]*[\d]*[d,D][\d]{1,2}|[+/-]*\d+)')
     rolls = hit_dice_regex.findall(dice_to_parse.lower())
-    nums = []
+    mods = []
     dice = []
     for roll in rolls:
         if 'd' in roll:
@@ -20,9 +20,8 @@ def parse_dice(dice_to_parse, req_data):
                 die.n = die.n + '1'
             dice.append(die)
         else:
-            nums.append(int(roll))
-    nums.extend(roll_dice(dice, req_data))
-    return sum(nums)
+            mods.append(int(roll))
+    return {'modifier': mods, 'dice': dice}
 
 
 def roll_dice(rand_list, req_data):
@@ -54,7 +53,8 @@ def main():
         "id": 18730
     }
     user_input = input('Roll the dice!\n')
-    result = parse_dice(user_input, req_data)
+    parsed_dice = parse_dice(user_input)
+    result = sum(parsed_dice['modifier']) + sum(roll_dice(parsed_dice['dice'], req_data))
     print(result)
 
 
