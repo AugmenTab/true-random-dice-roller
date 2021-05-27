@@ -1,27 +1,28 @@
 #! python3
 
 from collections import namedtuple
+from itertools import groupby
 import config
 import re
 import requests
 
 
+def parse_die(roll):
+    Roll = namedtuple('Roll', 'n max')
+    x = roll.split('d')
+    die = Roll(x[0], x[1])
+    if die.n in ('', '+', '-'):
+        die.n = die.n + '1'
+        print(die)
+    return die
+
+
 def parse_dice(dice_to_parse):
     hit_dice_regex = re.compile(r'([+/-]*[\d]*[d,D][\d]{1,2}|[+/-]*\d+)')
     rolls = hit_dice_regex.findall(dice_to_parse.lower())
-    mods = []
-    dice = []
-    for roll in rolls:
-        if 'd' in roll:
-            Roll = namedtuple('Roll', 'n max')
-            x = roll.split('d')
-            die = Roll(x[0], x[1])
-            if die.n in ('', '+', '-'):
-                die.n = die.n + '1'
-            dice.append(die)
-        else:
-            mods.append(int(roll))
-    return {'modifier': mods, 'dice': dice}
+    groups = groupby(rolls, lambda r: 'dice' if 'd' in r else 'modifier')
+    parsers = {'dice': parse_die, 'modifier': int}
+    return {k: list(map(lambda a: parsers[k](a), g)) for k, g in groups}
 
 
 def roll_dice(rand_list, req_data):
@@ -54,7 +55,7 @@ def main():
     }
     user_input = input('Roll the dice!\n')
     parsed_dice = parse_dice(user_input)
-    result = sum(parsed_dice['modifier']) + sum(roll_dice(parsed_dice['dice'], req_data))
+    result = sum(parsed_dice.get('modifier', [])) + sum(roll_dice(parsed_dice.get('dice', []), req_data))
     print(result)
 
 
